@@ -104,6 +104,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set Lowercase Repository Name
+        run: |
+          echo "REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
       # Build and push Server image
       - name: Build and Push Server Docker Image
         uses: docker/build-push-action@v5
@@ -112,8 +116,8 @@ jobs:
           file: ./server/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/pern-server:latest
-            ghcr.io/${{ github.repository }}/pern-server:${{ github.sha }}
+            ghcr.io/${{ env.REPO_LC }}/pern-server:latest
+            ghcr.io/${{ env.REPO_LC }}/pern-server:${{ github.sha }}
 
       # Build and push Client image
       - name: Build and Push Client Docker Image
@@ -123,8 +127,8 @@ jobs:
           file: ./client/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/pern-client:latest
-            ghcr.io/${{ github.repository }}/pern-client:${{ github.sha }}
+            ghcr.io/${{ env.REPO_LC }}/pern-client:latest
+            ghcr.io/${{ env.REPO_LC }}/pern-client:${{ github.sha }}
 
       # Trigger Cloud Platform or Webhook Deployment (Optional - e.g. Render / Railway / Webhook)
       - name: Trigger Webhook Deploy (Optional)
@@ -141,5 +145,5 @@ jobs:
           echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Images Published:**" >> $GITHUB_STEP_SUMMARY
-          echo "  - \`ghcr.io/${{ github.repository }}/pern-server:latest\`" >> $GITHUB_STEP_SUMMARY
-          echo "  - \`ghcr.io/${{ github.repository }}/pern-client:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "  - \`ghcr.io/${{ env.REPO_LC }}/pern-server:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "  - \`ghcr.io/${{ env.REPO_LC }}/pern-client:latest\`" >> $GITHUB_STEP_SUMMARY
